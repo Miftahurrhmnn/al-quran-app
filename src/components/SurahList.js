@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import SurahCard from "./SurahCard";
 
@@ -37,12 +38,25 @@ function SurahList({ onSelect }) {
 
   return (
     <div>
-      <input 
-        type="text"
-        placeholder="Cari surat..."
-        className="w-full mb-10 p-4 rounded-xl bg-white/10 backdrop-blur-md border border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold placeholder-cream/60"
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="relative mb-10">
+
+        {/* Icon */}
+        <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gold opacity-70 pointer-events-none z-10" />
+
+        {/* Input */}
+        <input
+          type="text"
+          placeholder="Cari surat..."
+          className="w-full pl-12 pr-4 py-4 rounded-xl 
+                    bg-white/10 backdrop-blur-md 
+                    border border-gold/40 
+                    focus:outline-none focus:ring-2 focus:ring-gold
+                    placeholder-cream/60 text-cream
+                    transition duration-300"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+      </div>
 
       {loading && (
         <div className="text-center py-20 animate-pulse opacity-70">

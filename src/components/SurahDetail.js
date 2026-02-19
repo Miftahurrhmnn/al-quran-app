@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import AyatCard from "./AyatCard";
 
@@ -84,14 +85,27 @@ function SurahDetail({ surahNumber, onBack }) {
       </button>
 
       {/* SEARCH AYAT */}
-      <input
-        type="text"
-        placeholder="Cari nomor ayat atau kata terjemahan..."
-        className="w-full mb-6 p-4 rounded-xl bg-white/10 backdrop-blur-md 
-                   border border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="relative mb-10">
+        <FaSearch
+          className="absolute left-4 top-1/2 -translate-y-1/2 
+                    text-gold opacity-70 
+                    group-focus-within:opacity-100
+                    transition duration-300
+                    pointer-events-none z-10"
+        />
+
+        <input
+          type="text"
+          placeholder="Cari nomor ayat atau kata terjemahan..."
+          className="w-full pl-12 pr-4 py-4 rounded-xl
+               bg-white/10 backdrop-blur-md
+               border border-gold/40
+               text-cream placeholder-cream/60
+               focus:outline-none focus:ring-2 focus:ring-gold
+               transition duration-300"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
       {/* PROGRESS BAR */}
       <div className="w-full bg-white/10 h-3 rounded-full mb-10">

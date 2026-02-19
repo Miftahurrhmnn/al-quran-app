@@ -12,7 +12,7 @@ function App() {
       <div className='max-w-6xl mx-auto px-6 py-10'>
         
         <h1 className='text-5xl font-light text-center mb-4 tracking-wide'>Al-Qur'an Digital</h1>
-        <p className='text-center mb-12 opacity-30'>©2026 Miftahurrahman | All Rights Reserved</p>
+        <p className='text-sm text-center mb-12 opacity-30'>©2026 Miftahurrahman | All Rights Reserved</p>
 
         {!selectedSurah ? (
           <SurahList onSelect={setSelectedSurah} />
