@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const KAABA_LAT = 21.4225;
 const KAABA_LNG = 39.8262;
 
 function QiblaCompass() {
 
-  const [heading, setHeading] = useState(0);
-  const [smoothHeading, setSmoothHeading] = useState(0);
-  const [qiblaDirection, setQiblaDirection] = useState(null);
+  const needleRef = useRef(null);
+  const [qibla, setQibla] = useState(0);
+  const headingRef = useRef(0);
 
-  /* ================= HITUNG ARAH KIBLAT ================= */
+  /* ================= HITUNG BEARING ================= */
 
   const calculateQibla = (lat, lng) => {
 
-    const toRad = (deg) => deg * (Math.PI / 180);
-    const toDeg = (rad) => rad * (180 / Math.PI);
+    const toRad = deg => deg * (Math.PI / 180);
+    const toDeg = rad => rad * (180 / Math.PI);
 
     const φ1 = toRad(lat);
     const φ2 = toRad(KAABA_LAT);
@@ -25,23 +25,24 @@ function QiblaCompass() {
       Math.cos(φ1) * Math.sin(φ2) -
       Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
 
-    const θ = Math.atan2(y, x);
-
-    return (toDeg(θ) + 360) % 360;
+    return (toDeg(Math.atan2(y, x)) + 360) % 360;
   };
 
-  /* ================= GET LOKASI ================= */
+  /* ================= GET USER LOCATION ================= */
 
   useEffect(() => {
 
-    navigator.geolocation.getCurrentPosition((pos) => {
-
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      setQiblaDirection(calculateQibla(lat, lng));
-
-    });
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const direction = calculateQibla(
+          pos.coords.latitude,
+          pos.coords.longitude
+        );
+        setQibla(direction);
+      },
+      err => console.log(err),
+      { enableHighAccuracy: true }
+    );
 
   }, []);
 
@@ -49,42 +50,73 @@ function QiblaCompass() {
 
   useEffect(() => {
 
-    const handleOrientation = (event) => {
+    const enableCompass = async () => {
 
-      if (event.alpha !== null) {
-        setHeading(event.alpha);
+      if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+      ) {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission !== "granted") return;
       }
+
+      window.addEventListener("deviceorientation", handleOrientation, true);
 
     };
 
-    window.addEventListener("deviceorientationabsolute", handleOrientation, true);
-    window.addEventListener("deviceorientation", handleOrientation, true);
+    enableCompass();
 
     return () => {
-      window.removeEventListener("deviceorientationabsolute", handleOrientation);
       window.removeEventListener("deviceorientation", handleOrientation);
     };
 
   }, []);
 
-  /* ================= SMOOTHING ================= */
+  const handleOrientation = (event) => {
+
+    let heading;
+
+    // iPhone
+    if (event.webkitCompassHeading) {
+      heading = event.webkitCompassHeading;
+    } 
+    // Android
+    else if (event.alpha !== null) {
+      heading = 360 - event.alpha;
+    }
+
+    if (heading !== undefined) {
+      headingRef.current = heading;
+    }
+
+  };
+
+  /* ================= SMOOTH ANIMATION LOOP ================= */
 
   useEffect(() => {
 
-    const smoothingFactor = 0.1;
+    let animationFrame;
 
-    setSmoothHeading(prev =>
-      prev + smoothingFactor * (heading - prev)
-    );
+    const animate = () => {
 
-  }, [heading]);
+      const currentHeading = headingRef.current;
+      const rotation = qibla - currentHeading;
 
-  const rotation =
-    qiblaDirection !== null
-      ? qiblaDirection - smoothHeading
-      : 0;
+      if (needleRef.current) {
 
-  const isAligned = Math.abs(rotation) < 5;
+        needleRef.current.style.transform =
+          `rotate(${rotation}deg)`;
+
+      }
+
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => cancelAnimationFrame(animationFrame);
+
+  }, [qibla]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F5F1E8]">
@@ -93,37 +125,24 @@ function QiblaCompass() {
         Arah Kiblat
       </h1>
 
-      {/* Compass Body */}
       <div className="relative w-72 h-72 rounded-full
                       bg-gradient-to-br from-white to-gray-100
                       shadow-2xl flex items-center justify-center">
 
-        {/* Outer Glow */}
-        <div className="absolute inset-0 rounded-full
-                        border-4 border-purple-200" />
-
-        {/* Needle */}
         <div
-          className="absolute transition-transform duration-300 ease-out"
-          style={{ transform: `rotate(${rotation}deg)` }}
+          ref={needleRef}
+          className="absolute transition-transform"
         >
-          <div className="w-2 h-28 bg-gradient-to-t from-purple-600 to-pink-500 rounded-full shadow-lg" />
+          <div className="w-2 h-32 bg-gradient-to-t from-purple-600 to-pink-500 rounded-full shadow-lg" />
         </div>
 
-        {/* Center Dot */}
-        <div className="w-6 h-6 bg-purple-600 rounded-full shadow-lg z-10" />
+        <div className="w-6 h-6 bg-purple-600 rounded-full z-10 rounded-full" />
 
       </div>
 
       <p className="mt-6 text-sm text-gray-500">
-        Putar perangkat Anda perlahan
+        Putar perangkat Anda secara perlahan
       </p>
-
-      {isAligned && (
-        <p className="mt-2 text-green-600 font-semibold">
-          ✔ Arah Kiblat Tepat
-        </p>
-      )}
 
     </div>
   );

@@ -8,6 +8,7 @@ import QiblaCompass from "./components/Qibla/QiblaCompass";
 import Hadith from "./components/Hadith";
 import Tracker from "./components/Tracker";
 import Tasbih from "./components/Tasbih";
+import DailyTracker from "./components/DailyTracker";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/qibla" component={QiblaCompass} />
           <Route path="/hadith" component={Hadith} />
           <Route path="/tracker" component={Tracker}/>
+          <Route path="/daily-tracker" component={DailyTracker} />
         </Switch>
       </Layout>
     </Router>

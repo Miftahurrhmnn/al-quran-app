@@ -46,7 +46,7 @@ function Tracker() {
       case 2:
         return "bg-green-600";
       default:
-        return "bg-gray-200";
+        return "bg-gray-300";
     }
   };
 
