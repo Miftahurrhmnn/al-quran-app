@@ -3,7 +3,6 @@ import Layout from "./components/Layout";
 import SurahList from "./components/Quran/SurahList";
 import SurahDetail from "./components/Quran/SurahDetail";
 import Home from "./components/Home";
-import Tracker from "./components/Tracker";
 import Dua from "./components/Dua";
 import Tasbih from "./components/Tasbih";
 import QiblaCompass from "./components/Qibla/QiblaCompass";
