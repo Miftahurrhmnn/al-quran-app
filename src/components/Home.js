@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import React, { useEffect, useState, useRef } from "react";
 import { FaBookOpen, FaPray, FaCompass, FaMosque } from "react-icons/fa";
+import { WiMoonWaningCrescent3 } from "react-icons/wi";
 import { Link, useHistory, useLocation } from "react-router-dom";
 
 function Home() {
@@ -322,6 +323,13 @@ function Home() {
             Stop
           </button>
         </div>
+            
+        <WiMoonWaningCrescent3 
+          className="absolute top-10 right-8
+             text-6xl text-yellow-300 
+             drop-shadow-[0_0_20px_rgba(255,223,100,0.8)]
+             animate-float z-10"
+        />
 
         {/* ================= PRAYER ROW ================= */}
         <div className="mt-6 backdrop-blur-lg bg-white/10 
