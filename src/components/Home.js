@@ -288,7 +288,7 @@ useEffect(() => {
         </h2>
 
         <div className="mt-6">
-          <p className="text-sm opacity-70">Sehri Ends</p>
+          <p className="text-sm opacity-70">Waktu Berakhir</p>
           <h1 className="text-4xl font-bold mt-1">
             Imsak {times?.Imsak}
           </h1>
@@ -321,16 +321,19 @@ useEffect(() => {
         </div>
 
         {/* ================= PRAYER ROW ================= */}
-
-        <div className="flex justify-between text-xs mt-6 opacity-90">
-          {["Imsak","Fajr","Dhuhr","Asr","Maghrib","Isha"].map(prayer => (
-            <PrayerItem
-              key={prayer}
-              name={prayer}
-              time={times?.[prayer]}
-              active={activePrayer === prayer}
-            />
-          ))}
+        <div className="mt-6 backdrop-blur-lg bg-white/10 
+                border border-white/20 
+                rounded-2xl p-4 shadow-lg">
+          <div className="flex justify-between text-xs">
+            {["Imsak","Fajr","Dhuhr","Asr","Maghrib","Isha"].map(prayer => (
+              <PrayerItem
+                key={prayer}
+                name={prayer}
+                time={times?.[prayer]}
+                active={activePrayer === prayer}
+              />
+            ))}
+          </div>
         </div>
 
       </div>
@@ -372,23 +375,37 @@ useEffect(() => {
 
       {/* ================= DAILY QUOTE ================= */}
       <div className="px-5 mt-4">
-        <div className="bg-gradient-to-r from-purple-500 to-indigo-500
-                        rounded-2xl p-5 text-white shadow-md">
+        <div
+          className="relative overflow-hidden rounded-2xl p-6 shadow-xl
+                    bg-gradient-to-br 
+                    from-[#5b21b6] 
+                    via-[#7c3aed] 
+                    to-[#1e1b4b] 
+                    text-white transition-all duration-500"
+        >
 
-          <p className="text-xs uppercase opacity-70 mb-2">
-            Daily Inspiration
-          </p>
+          {/* Soft Glow */}
+          <div className="absolute -top-12 -right-12 w-44 h-44 
+                          bg-pink-400/30 rounded-full blur-3xl z-0">
+          </div>
 
-          <p className="text-sm leading-relaxed italic">
-            “{dailyQuote?.text}”
-          </p>
+          <div className="relative z-10">
 
-          <p className="text-xs mt-3 opacity-80 text-right">
-            — {dailyQuote?.author}
-          </p>
+            <p className="text-xs uppercase opacity-70 mb-2 tracking-wide">
+              Daily Inspiration
+            </p>
 
+            <p className="text-sm leading-relaxed italic">
+              “{dailyQuote?.text}”
+            </p>
+
+            <p className="text-xs mt-3 opacity-80 text-right">
+              — {dailyQuote?.author}
+            </p>
+          </div>
         </div>
       </div>
+
 
 
     </div>

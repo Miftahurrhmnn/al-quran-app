@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
 function Hadith() {
@@ -8,7 +8,7 @@ function Hadith() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const fetchHadith = async () => {
+  const fetchHadith = useCallback(async () => {
 
     try {
       setLoading(true);
@@ -24,11 +24,11 @@ function Hadith() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [kitab, page]);
 
   useEffect(() => {
     fetchHadith();
-  }, [kitab, page]);
+  }, [fetchHadith]);
 
   return (
     <div className="p-5">
