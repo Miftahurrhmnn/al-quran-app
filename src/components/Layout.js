@@ -6,7 +6,6 @@ function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex justify-center">
-
       <div className="w-full max-w-md relative min-h-screen">
 
         <div className="pb-28">

@@ -207,6 +207,66 @@ function Home() {
     }
   };
 
+
+  const quotes = [
+  {
+    text: "Jangan pernah menunda taubat, karena kita tidak pernah tahu kapan Allah memanggil kita.",
+    author: "Ustadz Hadi Hidayat"
+  },
+  {
+    text: "Ilmu itu bukan untuk dibanggakan, tapi untuk diamalkan.",
+    author: "Ustadz Hadi Hidayat"
+  },
+  {
+    text: "Dunia itu sementara, jangan sampai hati kita lebih terikat padanya daripada akhirat.",
+    author: "Ustadz Khalid Basalamah"
+  },
+  {
+    text: "Ibadah kecil tapi istiqamah lebih dicintai Allah daripada besar tapi jarang.",
+    author: "Ustadz Khalid Basalamah"
+  },
+  {
+  text: "Kalau dia memang untukmu, Allah akan dekatkan. Kalau tidak, Allah akan gantikan dengan yang lebih baik.",
+  author: "Ustadz Hadi Hidayat"
+  },
+  {
+    text: "Cinta yang tidak membawa kita kepada Allah, biasanya hanya membawa luka.",
+    author: "Ustadz Khalid Basalamah"
+  },
+  {
+    text: "Tidak semua yang kita inginkan itu baik. Kadang Allah menjauhkan karena Dia lebih tahu.",
+    author: "Ustadz Hadi Hidayat"
+  },
+  {
+    text: "Hati yang patah karena manusia akan sembuh ketika kembali kepada Allah.",
+    author: "Ustadz Khalid Basalamah"
+  },
+  {
+    text: "Kalau kamu kehilangan dia, tapi kamu mendekat kepada Allah, maka sebenarnya kamu tidak kehilangan apa-apa.",
+    author: "Ustadz Hadi Hidayat"
+  },
+  {
+    text: "Jangan kejar yang menjauh. Kejar ridha Allah, nanti yang baik akan datang sendiri.",
+    author: "Ustadz Khalid Basalamah"
+  },
+  {
+    text: "Allah kadang mematahkan hatimu untuk menyelamatkan masa depanmu.",
+    author: "Ustadz Hadi Hidayat"
+  },
+  {
+    text: "Bersabarlah dalam luka, karena Allah sedang menyiapkan cerita yang lebih indah.",
+    author: "Ustadz Khalid Basalamah"
+  }
+];
+
+const [dailyQuote, setDailyQuote] = useState(null);
+
+useEffect(() => {
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  setDailyQuote(quotes[randomIndex]);
+}, []);
+
+
   return (
     <div>
 
@@ -309,6 +369,27 @@ function Home() {
           </div>
         </div>
       </div>
+
+      {/* ================= DAILY QUOTE ================= */}
+      <div className="px-5 mt-4">
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-500
+                        rounded-2xl p-5 text-white shadow-md">
+
+          <p className="text-xs uppercase opacity-70 mb-2">
+            Daily Inspiration
+          </p>
+
+          <p className="text-sm leading-relaxed italic">
+            “{dailyQuote?.text}”
+          </p>
+
+          <p className="text-xs mt-3 opacity-80 text-right">
+            — {dailyQuote?.author}
+          </p>
+
+        </div>
+      </div>
+
 
     </div>
   );
