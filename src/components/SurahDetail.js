@@ -4,6 +4,7 @@ import axios from "axios";
 function SurahDetail({ surahNumber, onBack }) {
   const [ayahs, setAyahs] = useState([]);
   const [currentAyah, setCurrentAyah] = useState(null);
+  const [search, setSearch] = useState("");
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -35,6 +36,20 @@ function SurahDetail({ surahNumber, onBack }) {
 
   const progress = currentAyah && ayahs.length > 0 ? (currentAyah / ayahs.length) * 100 : 0;
 
+  // FILTER AYAT
+  const filteredAyahs = ayahs.filter(ayah => {
+    if (!search) return true;
+
+    // Search by nomor ayat
+    if (ayah.number.toString() === search) return true;
+
+    // Search by translation
+    if (ayah.translation.toLowerCase().includes(search.toLowerCase()))
+      return true;
+
+    return false;
+  });
+
   return (
     <div>
       <button 
@@ -44,6 +59,16 @@ function SurahDetail({ surahNumber, onBack }) {
       >
         ← Kembali
       </button>
+
+      {/* SEARCH AYAT */}
+      <input
+        type="text"
+        placeholder="Cari nomor ayat atau kata terjemahan..."
+        className="w-full mb-6 p-4 rounded-xl bg-white/10 backdrop-blur-md 
+                   border border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
       {/* PROGRESS BAR */}
       <div className="w-full bg-white/10 h-3 rounded-full mb-10">
@@ -56,7 +81,11 @@ function SurahDetail({ surahNumber, onBack }) {
       {/* Hidden Global Audio Player */}
       <audio ref={audioRef} />
 
-      {ayahs.map((ayah) => (
+      {filteredAyahs.length === 0 && (
+        <p className="text-center opacity-70">Ayat tidak ditemukan</p>
+      )}
+
+      {filteredAyahs.map((ayah) => (
         <div
           key={ayah.number}
           className={`mb-8 p-8 rounded-3xl backdrop-blur-lg border transition duration-500
