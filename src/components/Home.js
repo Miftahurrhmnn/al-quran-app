@@ -262,7 +262,7 @@ function Home() {
     author: "Ustadz Khalid Basalamah"
   }
   ];
-  
+
   const randomIndex = Math.floor(Math.random() * quotes.length);
   setDailyQuote(quotes[randomIndex]);
 }, []);
