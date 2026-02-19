@@ -1,18 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
+import SurahCard from "./SurahCard";
 
 function SurahList({ onSelect }) {
   const [surahs, setSurahs] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios.get("https://api.alquran.cloud/v1/surah")
-        .then(res => setSurahs(res.data.data));
+   useEffect(() => {
+    const fetchSurah = async () => {
+      try {
+        const res = await axios.get("https://api.alquran.cloud/v1/surah");
+        setSurahs(res.data.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSurah();
   }, []);
 
-  const filtered = surahs.filter(s =>
-    s.englishName.toLowerCase().includes(search.toLowerCase())
-  );
+  // Memoized filter
+  const filteredSurahs = useMemo(() => {
+    return surahs.filter((s) =>
+      s.englishName.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [surahs, search]);
+
+  // Stable function reference
+  const handleSelect = useCallback((number) => {
+    onSelect(number);
+  }, [onSelect]);
+
 
   return (
     <div>
@@ -23,31 +44,26 @@ function SurahList({ onSelect }) {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        
-        {filtered.map(surah => (
-          <div
-            key={surah.number}
-            className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl p-6 cursor-pointer
-                       hover:scale-105 hover:border-gold hover:shadow-[0_0_25px_rgba(212,175,55,0.3)]
-                       transition duration-500"
-            onClick={() => onSelect(surah.number)}
-          >
-            <div className="text-gold text-sm mb-2">
-              {surah.number}
-            </div>
+      {loading && (
+        <div className="text-center py-20 animate-pulse opacity-70">
+          Memuat daftar surat...
+        </div>
+      )}
 
-            <h3 className="text-lg font-semibold cursor-pointer">{surah.englishName}</h3>
+      {!loading && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredSurahs.map(surah => (
+              <SurahCard
+                  key={surah.number}
+                  surah={surah}
+                  onClick={handleSelect}
+              />
+            ))}
             
-            <p className="text-2xl text-right mt-4 font-arabic text-cream">{surah.name}</p>
-            
-            <p className="text-xs mt-2 opacity-60">
-              {surah.numberOfAyahs} Ayat
-            </p>
           </div>
-        ))}
-        
-      </div>
+        )
+      }
+
     </div>
   )
 
