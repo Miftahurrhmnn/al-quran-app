@@ -1,23 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import SurahList from "../src/components/SurahList"
+import SurahDetail from "../src/components/SurahDetail"
+import './index.css';
 
 function App() {
+  const [selectedSurah, setSelectedSurah] = useState(null);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-black text-cream">
+      
+      <div className='max-w-6xl mx-auto px-6 py-10'>
+        
+        <h1 className='text-5xl font-light text-center mb-12 tracking-wide'>Al-Qur'an Digital</h1>
+
+        {!selectedSurah ? (
+          <SurahList onSelect={setSelectedSurah} />
+        ) : (
+          <SurahDetail 
+              surahNumber={selectedSurah}
+              onBack={() => setSelectedSurah(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }
