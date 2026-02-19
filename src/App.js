@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import SurahList from "../src/components/SurahList"
-import SurahDetail from "../src/components/SurahDetail"
-import './index.css';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import SurahList from "./components/Quran/SurahList";
+import SurahDetail from "./components/Quran/SurahDetail";
+import Home from "./components/Home";
+import Tracker from "./components/Tracker";
+import Dua from "./components/Dua";
+import Tasbih from "./components/Tasbih";
+import QiblaCompass from "./components/Qibla/QiblaCompass";
+import Hadith from "./components/Hadith";
 
 function App() {
-  const [selectedSurah, setSelectedSurah] = useState(null);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-black text-cream">
-      
-      <div className='max-w-6xl mx-auto px-6 py-10'>
-        
-        <h1 className='text-5xl font-light text-center mb-4 tracking-wide'>Al-Qur'an Digital</h1>
-        <p className='text-sm text-center mb-12 opacity-30'>©2026 Miftahurrahman | All Rights Reserved</p>
-
-        {!selectedSurah ? (
-          <SurahList onSelect={setSelectedSurah} />
-        ) : (
-          <SurahDetail 
-              surahNumber={selectedSurah}
-              onBack={() => setSelectedSurah(null)}
-          />
-        )}
-      </div>
-    </div>
+    <Router>
+      <Layout>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/quran" component={SurahList} />
+          <Route path="/quran/:id" component={SurahDetail} />
+          <Route path="/dua" component={Dua} />
+          <Route path="/tasbih" component={Tasbih} />
+          <Route path="/qibla" component={QiblaCompass} />
+          <Route path="/hadith" component={Hadith} />
+        </Switch>
+      </Layout>
+    </Router>
   );
 }
 
