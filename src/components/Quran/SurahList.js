@@ -29,7 +29,7 @@ function SurahList() {
   return (
     <div>
 
-      <h1 className="text-2xl font-semibold mb-6">
+      <h1 className="m-4 text-2xl font-semibold mb-6">
         Al-Qur’an
       </h1>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { FaBookOpen, FaPray, FaCompass, FaMosque } from "react-icons/fa";
 import { Link, useHistory, useLocation } from "react-router-dom";
@@ -15,17 +15,20 @@ function Home() {
   const [hijriDate, setHijriDate] = useState(null);
   const [countdown, setCountdown] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activePrayer, setActivePrayer] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [lastPlayed, setLastPlayed] = useState(null);
 
-  /* ================= DAILY TRACKER PROGRESS ================= */
+  const audioRef = useRef(null);
+
+  /* ================= DAILY TRACKER ================= */
 
   useEffect(() => {
-
     const data = JSON.parse(localStorage.getItem("ramadanTracker")) || {};
     const completed = Object.values(data).filter(v => v > 0).length;
     const percentage = Math.round((completed / 30) * 100);
-
     setProgress(percentage);
-
   }, [location]);
 
   /* ================= FETCH PRAYER TIME ================= */
@@ -33,7 +36,6 @@ function Home() {
   useEffect(() => {
 
     const fetchData = async () => {
-
       try {
         const today = new Date();
         const day = String(today.getDate()).padStart(2, "0");
@@ -59,7 +61,6 @@ function Home() {
       } catch (err) {
         console.log(err);
       }
-
     };
 
     fetchData();
@@ -69,14 +70,48 @@ function Home() {
   /* ================= REAL TIME CLOCK ================= */
 
   useEffect(() => {
-
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
-
   }, []);
+
+  /* ================= ACTIVE PRAYER ================= */
+
+  useEffect(() => {
+
+    if (!times) return;
+
+    const now = currentTime;
+    const prayerList = ["Fajr","Dhuhr","Asr","Maghrib","Isha"];
+
+    const prayerTimes = prayerList.map(prayerName => {
+      const [hour, minute] = times[prayerName].split(":");
+      const date = new Date();
+      date.setHours(hour, minute, 0, 0);
+      return { prayerName, time: date };
+    });
+
+    for (let i = 0; i < prayerTimes.length; i++) {
+
+      const current = prayerTimes[i];
+      const next = prayerTimes[i + 1];
+
+      if (next) {
+        if (now >= current.time && now < next.time) {
+          setActivePrayer(current.prayerName);
+          return;
+        }
+      } else {
+        if (now >= current.time) {
+          setActivePrayer(current.prayerName);
+          return;
+        }
+      }
+    }
+
+  }, [currentTime, times]);
 
   /* ================= COUNTDOWN IMSAK ================= */
 
@@ -85,7 +120,6 @@ function Home() {
     if (!times) return;
 
     const now = currentTime;
-
     const [hour, minute] = times.Imsak.split(":");
 
     const imsakTime = new Date();
@@ -94,23 +128,92 @@ function Home() {
     const diff = imsakTime - now;
 
     if (diff > 0) {
-
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff / (1000 * 60)) % 60);
       const seconds = Math.floor((diff / 1000) % 60);
-
       setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-
     } else {
       setCountdown("Imsak sudah lewat");
     }
 
   }, [currentTime, times]);
 
+  /* ================= RESET LASTPLAYED SETIAP HARI ================= */
+
+  useEffect(() => {
+    if (
+      currentTime.getHours() === 0 &&
+      currentTime.getMinutes() === 0 &&
+      currentTime.getSeconds() === 5
+    ) {
+      setLastPlayed(null);
+    }
+  }, [currentTime]);
+
+  /* ================= ADZAN + NOTIFICATION ================= */
+
+  useEffect(() => {
+
+    if (!times) return;
+
+    const now = currentTime;
+    const prayerList = ["Fajr","Dhuhr","Asr","Maghrib","Isha"];
+
+    prayerList.forEach(prayerName => {
+
+      const [hour, minute] = times[prayerName].split(":");
+
+      const prayerTime = new Date();
+      prayerTime.setHours(hour, minute, 0, 0);
+
+      if (
+        now.getHours() === prayerTime.getHours() &&
+        now.getMinutes() === prayerTime.getMinutes() &&
+        now.getSeconds() === 0 &&
+        lastPlayed !== prayerName
+      ) {
+
+        // SOUND
+        if (soundEnabled && audioRef.current) {
+          audioRef.current.play();
+        }
+
+        // NOTIFICATION
+        if (notificationEnabled) {
+          new Notification("Waktu Sholat", {
+            body: `Sudah masuk waktu ${prayerName}`,
+            icon: "/logo192.png"
+          });
+        }
+
+        setLastPlayed(prayerName);
+      }
+
+    });
+
+  }, [currentTime, times, soundEnabled, notificationEnabled, lastPlayed]);
+
+  /* ================= REQUEST NOTIFICATION ================= */
+
+  const requestNotificationPermission = async () => {
+    if (!("Notification" in window)) {
+      alert("Browser tidak mendukung notifikasi");
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      setNotificationEnabled(true);
+    }
+  };
+
   return (
     <div>
 
+      <audio ref={audioRef} src="/audio/adzan.mp3" preload="auto" />
+
       {/* ================= HEADER ================= */}
+
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600
                       text-white rounded-b-3xl p-6 pb-10">
 
@@ -134,46 +237,60 @@ function Home() {
           </p>
         </div>
 
+        <div className="mt-4 space-x-2">
+          <button
+            onClick={() => setSoundEnabled(true)}
+            className="text-xs bg-white/20 px-3 py-1 rounded-full"
+          >
+            Enable Adzan Sound
+          </button>
+
+          <button
+            onClick={requestNotificationPermission}
+            className="text-xs bg-white/20 px-3 py-1 rounded-full"
+          >
+            Enable Notifikasi
+          </button>
+
+          <button
+            onClick={() => audioRef.current?.pause()}
+            className="text-xs bg-red-500/20 px-3 py-1 rounded-full"
+          >
+            Stop
+          </button>
+        </div>
+
         {/* ================= PRAYER ROW ================= */}
-        <div className="flex justify-between text-xs mt-6 opacity-80">
-          <PrayerItem name="Imsak" time={times?.Imsak} />
-          <PrayerItem name="Fajr" time={times?.Fajr} />
-          <PrayerItem name="Dhuhr" time={times?.Dhuhr} />
-          <PrayerItem name="Asr" time={times?.Asr} />
-          <PrayerItem name="Maghrib" time={times?.Maghrib} />
-          <PrayerItem name="Isha" time={times?.Isha} />
+
+        <div className="flex justify-between text-xs mt-6 opacity-90">
+          {["Imsak","Fajr","Dhuhr","Asr","Maghrib","Isha"].map(prayer => (
+            <PrayerItem
+              key={prayer}
+              name={prayer}
+              time={times?.[prayer]}
+              active={activePrayer === prayer}
+            />
+          ))}
         </div>
 
       </div>
 
       {/* ================= MENU GRID ================= */}
+
       <div className="px-5 -mt-8">
         <div className="bg-white rounded-3xl shadow-lg p-5 grid grid-cols-5 gap-4 text-center">
 
-          <Link to="/quran">
-            <Menu icon={<FaBookOpen />} label="Qur'an" />
-          </Link>
-
-          <Link to="/dua">
-            <Menu icon={<FaPray />} label="Doa" />
-          </Link>
-
-          <Link to="/tasbih">
-            <Menu icon={<FaMosque />} label="Tasbih" />
-          </Link>
-
-          <Link to="/qibla">
-            <Menu icon={<FaCompass />} label="Qiblat" />
-          </Link>
-
-          <Link to="/hadith">
-            <Menu icon={<FaBookOpen />} label="Hadis" />
-          </Link>
+          <Link to="/quran"><Menu icon={<FaBookOpen />} label="Qur'an" /></Link>
+          <Link to="/dua"><Menu icon={<FaPray />} label="Doa" /></Link>
+          <Link to="/tasbih"><Menu icon={<FaMosque />} label="Tasbih" /></Link>
+          <Link to="/qibla"><Menu icon={<FaCompass />} label="Qiblat" /></Link>
+          <Link to="/hadith"><Menu icon={<FaBookOpen />} label="Hadis" /></Link>
 
         </div>
       </div>
 
       {/* ================= DAILY TRACKER ================= */}
+
       <div className="px-5 mt-6">
         <div
           onClick={() => history.push("/daily-tracker")}
@@ -181,9 +298,7 @@ function Home() {
         >
           <div className="flex justify-between items-center">
             <p className="text-sm font-medium">Daily Tracker</p>
-            <p className="text-purple-600 text-sm">
-              {progress}%
-            </p>
+            <p className="text-purple-600 text-sm">{progress}%</p>
           </div>
 
           <div className="h-2 bg-gray-200 rounded-full mt-3">
@@ -195,28 +310,18 @@ function Home() {
         </div>
       </div>
 
-      {/* ================= START READING ================= */}
-      <div className="px-5 mt-4">
-        <div
-          onClick={() => history.push("/quran")}
-          className="bg-white rounded-2xl p-4 shadow-sm cursor-pointer"
-        >
-          <p className="text-sm font-medium">Start Reading</p>
-          <p className="text-xs text-gray-500 mt-1">
-            Continue your Quran journey
-          </p>
-        </div>
-      </div>
-
     </div>
   );
 }
 
 /* ================= COMPONENT ================= */
 
-function PrayerItem({ name, time }) {
+function PrayerItem({ name, time, active }) {
   return (
-    <div className="text-center">
+    <div
+      className={`text-center transition-all duration-300
+        ${active ? "text-yellow-300 scale-110 font-bold" : ""}`}
+    >
       <p>{name}</p>
       <p className="font-semibold">{time || "--:--"}</p>
     </div>

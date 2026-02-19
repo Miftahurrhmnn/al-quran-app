@@ -112,19 +112,16 @@ function PrayerCard() {
         Next: {nextPrayer} • {countdown}
       </p>
 
-      {/* PRAYER ROW */}
-      <div className="flex justify-between text-xs mt-6">
 
+      {/* PRAYER ROW */}
+      <div className="flex justify-between text-xs mt-6 opacity-90">
         {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map(prayer => (
-          <div
-            key={prayer}
-            className={`text-center ${
-              nextPrayer === prayer ? "font-bold text-yellow-300" : ""
-            }`}
-          >
-            <p>{prayer}</p>
-            <p>{times[prayer]}</p>
-          </div>
+           <PrayerItem
+              key={prayer}
+              name={prayer}
+              time={times?.[prayer]}
+              active={activePrayer === prayer}
+            />
         ))}
 
       </div>

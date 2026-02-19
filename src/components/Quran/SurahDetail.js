@@ -160,7 +160,7 @@ function SurahDetail() {
         <input
           type="text"
           placeholder="Search..."
-          className="px-3 py-2 rounded-lg text-black"
+          className="px-3 py-2 rounded-lg text-black border"
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
