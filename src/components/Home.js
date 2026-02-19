@@ -1,8 +1,25 @@
+import React from "react";
 import { FaBookOpen, FaPray, FaCompass, FaMosque } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import React from "react";
+import { useEffect, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 
 function Home() {
+  const [progress, setProgress] = useState(0);
+  const history = useHistory();
+  const location = useLocation();
+
+  useEffect(() => {
+
+  const data = JSON.parse(localStorage.getItem("ramadanTracker")) || {};
+  const completed = Object.values(data).filter(v => v > 0).length;
+  const percentage = Math.round((completed / 30) * 100);
+
+  setProgress(percentage);
+
+  }, [location]);
+
+
   return (
     <div>
 
@@ -42,23 +59,23 @@ function Home() {
         <div className="bg-white rounded-3xl shadow-lg p-5 grid grid-cols-5 gap-4 text-center">
 
           <Link to="/quran">
-            <Menu icon={<FaBookOpen />} label="Quran" />
+            <Menu icon={<FaBookOpen />} label="Qur'an" />
           </Link>
 
           <Link to="/dua">
-            <Menu icon={<FaPray />} label="Dua" />
+            <Menu icon={<FaPray />} label="Doa" />
           </Link>
 
-          <Link to="/tashbih">
+          <Link to="/tasbih">
             <Menu icon={<FaMosque />} label="Tasbih" />
           </Link>
 
           <Link to="qibla">
-            <Menu icon={<FaCompass />} label="Qibla" />
+            <Menu icon={<FaCompass />} label="Qiblat" />
           </Link>
 
           <Link to="hadith">
-            <Menu icon={<FaBookOpen />} label="Hadith" />
+            <Menu icon={<FaBookOpen />} label="Hadis" />
           </Link>
 
         </div>
@@ -66,13 +83,26 @@ function Home() {
 
       {/* DAILY TRACKER CARD */}
       <div className="px-5 mt-6">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
+        <div
+          onClick={() => history.push("/tracker")}
+          className="bg-white rounded-2xl p-4 shadow-sm cursor-pointer"
+        >
           <div className="flex justify-between items-center">
             <p className="text-sm font-medium">Daily Tracker</p>
-            <p className="text-purple-600 text-sm">0%</p>
+            <p className="text-purple-600 text-sm">
+              {progress}%
+            </p>
+          </div>
+
+          <div className="h-2 bg-gray-200 rounded-full mt-3">
+            <div
+              className="h-2 bg-green-500 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
       </div>
+
 
       {/* START READING */}
       <div className="px-5 mt-4">

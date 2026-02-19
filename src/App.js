@@ -4,9 +4,10 @@ import SurahList from "./components/Quran/SurahList";
 import SurahDetail from "./components/Quran/SurahDetail";
 import Home from "./components/Home";
 import Dua from "./components/Dua";
-import Tasbih from "./components/Tasbih";
 import QiblaCompass from "./components/Qibla/QiblaCompass";
 import Hadith from "./components/Hadith";
+import Tracker from "./components/Tracker";
+import Tasbih from "./components/Tasbih";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/tasbih" component={Tasbih} />
           <Route path="/qibla" component={QiblaCompass} />
           <Route path="/hadith" component={Hadith} />
+          <Route path="/tracker" component={Tracker}/>
         </Switch>
       </Layout>
     </Router>
