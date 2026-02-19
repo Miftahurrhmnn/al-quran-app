@@ -208,6 +208,10 @@ function Home() {
   };
 
 
+  
+  const [dailyQuote, setDailyQuote] = useState(null);
+  
+  useEffect(() => {
   const quotes = [
   {
     text: "Jangan pernah menunda taubat, karena kita tidak pernah tahu kapan Allah memanggil kita.",
@@ -257,11 +261,8 @@ function Home() {
     text: "Bersabarlah dalam luka, karena Allah sedang menyiapkan cerita yang lebih indah.",
     author: "Ustadz Khalid Basalamah"
   }
-];
-
-const [dailyQuote, setDailyQuote] = useState(null);
-
-useEffect(() => {
+  ];
+  
   const randomIndex = Math.floor(Math.random() * quotes.length);
   setDailyQuote(quotes[randomIndex]);
 }, []);
@@ -274,7 +275,9 @@ useEffect(() => {
 
       {/* ================= HEADER ================= */}
 
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600
+      <div className="bg-gradient-to-br from-[#5b21b6] 
+                      via-[#7c3aed] 
+                      to-[#1e1b4b] 
                       text-white rounded-b-3xl p-6 pb-10">
 
         <p className="text-sm opacity-80">
