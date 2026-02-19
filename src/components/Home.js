@@ -417,6 +417,9 @@ function Home() {
         </div>
       </div>
 
+      <div className="text-center text-[11px] text-gray-400 mt-10 pb-28">
+        © {new Date().getFullYear()} Miftahurrahman. All rights reserved.
+      </div>
 
 
     </div>
