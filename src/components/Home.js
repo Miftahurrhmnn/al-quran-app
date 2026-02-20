@@ -20,7 +20,6 @@ function Home() {
   const [selectedCity, setSelectedCity] = useState(
     localStorage.getItem("city") || "Jakarta"
   );
-  const [selectedCountry, setSelectedCountry] = useState("Indonesia");
 
   const [selectedTimezone, setSelectedTimezone] = useState(
     localStorage.getItem("timezone") || "Asia/Jakarta"
@@ -30,17 +29,14 @@ function Home() {
   const [progress, setProgress] = useState(0);
   const [times, setTimes] = useState(null);
   const [hijriDate, setHijriDate] = useState(null);
-  const [countdown, setCountdown] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activePrayer, setActivePrayer] = useState(null);
   const [nextPrayer, setNextPrayer] = useState(null);
   const [nextPrayerTime, setNextPrayerTime] = useState(null);
   const [countdownNext, setCountdownNext] = useState("");
-  const [soundEnabled, setSoundEnabled] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [lastPlayed, setLastPlayed] = useState(null);
   const audioRef = useRef(null);
-  const [user, setUser] = useState(null);
   
 
 
@@ -52,18 +48,6 @@ function Home() {
 
       return () => unsubscribe();
     }, []);
-
-    const handleLogin = async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const handleLogout = async () => {
-      await signOut(auth);
-    };
 
 
 
@@ -245,63 +229,6 @@ useEffect(() => {
     }
   }, [currentTime]);
 
-  /* ================= ADZAN + NOTIFICATION ================= */
-
-  useEffect(() => {
-
-    if (!times) return;
-
-    const now = currentTime;
-    const prayerList = ["Fajr","Dhuhr","Asr","Maghrib","Isha"];
-
-    prayerList.forEach(prayerName => {
-
-      const [hour, minute] = times[prayerName].split(":");
-
-      const prayerTime = new Date();
-      prayerTime.setHours(hour, minute, 0, 0);
-
-      if (
-        now.getHours() === prayerTime.getHours() &&
-        now.getMinutes() === prayerTime.getMinutes() &&
-        now.getSeconds() === 0 &&
-        lastPlayed !== prayerName
-      ) {
-
-        // SOUND
-        if (soundEnabled && audioRef.current) {
-          audioRef.current.play();
-        }
-
-        // NOTIFICATION
-        if (notificationEnabled) {
-          new Notification("Waktu Sholat", {
-            body: `Sudah masuk waktu ${prayerName}`,
-            icon: "/logo192.png"
-          });
-        }
-
-        setLastPlayed(prayerName);
-      }
-
-    });
-
-  }, [currentTime, times, soundEnabled, notificationEnabled, lastPlayed]);
-
-  /* ================= REQUEST NOTIFICATION ================= */
-
-  const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) {
-      alert("Browser tidak mendukung notifikasi");
-      return;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      setNotificationEnabled(true);
-    }
-  };
-  
 
   /* ================= QOUTES  ================= */
   const [dailyQuote, setDailyQuote] = useState(null);
