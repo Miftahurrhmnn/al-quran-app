@@ -7,9 +7,6 @@ import { WiMoonWaningCrescent3 } from "react-icons/wi";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 
-import { auth, provider } from "../firebase";
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-
 function Home() {
 
   const history = useHistory();
@@ -21,12 +18,10 @@ function Home() {
     localStorage.getItem("city") || "Jakarta"
   );
 
-  const [selectedCountry, setSelectedCountry] = useState("Indonesia");
-
   const [selectedTimezone, setSelectedTimezone] = useState(
     localStorage.getItem("timezone") || "Asia/Jakarta"
   );
-  const [countdown, setCountdown] = useState("");
+
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isChangingLocation, setIsChangingLocation] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -37,8 +32,6 @@ function Home() {
   const [nextPrayer, setNextPrayer] = useState(null);
   const [nextPrayerTime, setNextPrayerTime] = useState(null);
   const [countdownNext, setCountdownNext] = useState("");
-  const [notificationEnabled, setNotificationEnabled] = useState(false);
-  const [lastPlayed, setLastPlayed] = useState(null);
   const audioRef = useRef(null);
 
 
@@ -70,7 +63,7 @@ function Home() {
           {
             params: {
               city: selectedCity,
-              country: selectedCountry,
+              country: "Indonesia",
               method: 11
             }
           }
@@ -182,44 +175,6 @@ useEffect(() => {
 
 }, [currentTime, nextPrayerTime]);
 
-
-
-  /* ================= COUNTDOWN IMSAK ================= */
-
-  useEffect(() => {
-
-    if (!times) return;
-
-    const now = currentTime;
-    const [hour, minute] = times.Imsak.split(":");
-
-    const imsakTime = new Date();
-    imsakTime.setHours(hour, minute, 0, 0);
-
-    const diff = imsakTime - now;
-
-    if (diff > 0) {
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-    } else {
-      setCountdown("Imsak sudah lewat");
-    }
-
-  }, [currentTime, times]);
-
-  /* ================= RESET LASTPLAYED SETIAP HARI ================= */
-
-  useEffect(() => {
-    if (
-      currentTime.getHours() === 0 &&
-      currentTime.getMinutes() === 0 &&
-      currentTime.getSeconds() === 5
-    ) {
-      setLastPlayed(null);
-    }
-  }, [currentTime]);
 
 
   /* ================= QOUTES  ================= */
@@ -356,30 +311,6 @@ useEffect(() => {
             })}
           </p>
         </div>
-
-        {/* ================= TOMBOL ================= */}
-        {/* <div className="mt-4 space-x-2">
-          <button
-            onClick={() => setSoundEnabled(true)}
-            className="text-xs bg-white/20 px-3 py-1 rounded-full"
-          >
-            Enable Adzan Sound
-          </button>
-
-          <button
-            onClick={requestNotificationPermission}
-            className="text-xs bg-white/20 px-3 py-1 rounded-full"
-          >
-            Enable Notifikasi
-          </button>
-
-          <button
-            onClick={() => audioRef.current?.pause()}
-            className="text-xs bg-red-500/20 px-3 py-1 rounded-full"
-          >
-            Stop
-          </button>
-        </div> */}
             
         <WiMoonWaningCrescent3 
           className="absolute top-10 right-8
@@ -387,29 +318,6 @@ useEffect(() => {
              drop-shadow-[0_0_20px_rgba(255,223,100,0.8)]
              animate-float z-10"
         />
-
-        {/* ================= LOGIN ================= */}
-        {/* <div className="absolute top-6 right-6">
-        {user ? (
-          <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-full">
-            <img
-              src={user.photoURL}
-              alt="profile"
-              className="w-6 h-6 rounded-full"
-            />
-            <button onClick={handleLogout} className="text-xs">
-              Logout
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={handleLogin}
-            className="bg-white/20 px-4 py-2 rounded-full text-sm"
-          >
-            Login
-          </button>
-        )}
-      </div> */}
 
 
         {/* ================= PRAYER ROW ================= */}
