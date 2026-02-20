@@ -21,9 +21,12 @@ function Home() {
     localStorage.getItem("city") || "Jakarta"
   );
 
+  const [selectedCountry, setSelectedCountry] = useState("Indonesia");
+
   const [selectedTimezone, setSelectedTimezone] = useState(
     localStorage.getItem("timezone") || "Asia/Jakarta"
   );
+  const [countdown, setCountdown] = useState("");
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isChangingLocation, setIsChangingLocation] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -37,17 +40,6 @@ function Home() {
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [lastPlayed, setLastPlayed] = useState(null);
   const audioRef = useRef(null);
-  
-
-
-   /* ================= FIREBASE LOGIN ================= */
-    useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-      });
-
-      return () => unsubscribe();
-    }, []);
 
 
 
