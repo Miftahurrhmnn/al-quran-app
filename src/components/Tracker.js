@@ -85,13 +85,21 @@ function Tracker() {
           const level = days[day] || 0;
 
           return (
-            <div
+            <button
+              type="button"
+              data-testid={`day-${day}`}
               key={day}
               onClick={() => toggleDay(day)}
-              className={`aspect-square rounded-md cursor-pointer transition 
+              className={`
+                aspect-square 
+                rounded-md 
+                cursor-pointer 
+                transition 
+                border
                 ${getColor(level)}
-                ${day === today ? "ring-2 ring-purple-500" : ""}
-                hover:scale-105`}
+                ${day === today ? "border-2 border-purple-500" : "border-gray-200"}
+                hover:brightness-95
+              `}
             />
           );
         })}

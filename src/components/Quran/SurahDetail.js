@@ -128,85 +128,111 @@ function SurahDetail() {
     a.number.toString() === search
   );
 
-  return (
-    <div>
+return (
+  <div className="min-h-screen bg-gray-50">
 
-      <button onClick={() => history.goBack()} className="mb-4 text-purple-500">
+    <div className="max-w-3xl mx-auto px-4 py-6">
+
+      {/* Back */}
+      <button 
+        onClick={() => history.goBack()} 
+        className="text-lg text-purple-600 mb-4 hover:underline"
+      >
         ← Back
       </button>
 
+      {/* Header */}
       {surahInfo && (
-        <>
-          <h1 className="text-xl font-semibold">
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl p-6 shadow-lg mb-6">
+          <h1 className="text-2xl font-semibold">
             {surahInfo.englishName}
           </h1>
-          <p className="text-sm opacity-60 mb-4">
+          <p className="text-sm opacity-80 mt-1">
             {surahInfo.numberOfAyahs} Ayat
           </p>
-        </>
+        </div>
       )}
 
       {/* Controls */}
-      <div className="flex gap-4 mb-4">
-        <button onClick={togglePlayAll} className="px-4 py-2 bg-purple-600 text-white rounded-xl">
-          {isPlaying ? <FaPause /> : <FaPlay />}
+      <div className="bg-white rounded-2xl shadow-sm p-4 mb-6 flex items-center gap-3">
+
+        <button
+          onClick={togglePlayAll}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition"
+        >
+          {isPlaying ? <FaPause size={14} /> : <FaPlay size={14} />}
         </button>
 
         <input
           type="text"
-          placeholder="Search..."
-          className="px-3 py-2 rounded-lg text-black border"
+          placeholder="Cari arti ayat..."
+          value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
 
       <audio ref={audioRef} />
 
-      <div className="space-y-6">
+      {/* Ayah List */}
+      <div className="space-y-5">
 
-        {filteredAyahs.map((ayah, index) => (
-          <div key={ayah.number}
-               className={`p-4 rounded-2xl shadow-md 
-               ${currentIndex === index ? "bg-purple-100" : ""}`}>
+        {filteredAyahs.map((ayah, index) => {
 
-            <div className="flex justify-between items-center">
+          const isActive = currentIndex === index;
+          const isBookmarked = bookmarks.includes(ayah.number);
 
-              <p className="text-sm opacity-60">
-                Ayat {ayah.number}
+          return (
+            <div
+              key={ayah.number}
+              className={`bg-white rounded-2xl p-5 shadow-sm transition 
+              ${isActive ? "ring-2 ring-purple-500 bg-purple-50" : ""}`}
+            >
+
+              {/* Top Row */}
+              <div className="flex justify-between items-center mb-3">
+
+                <span className="text-xs text-gray-400">
+                  Ayat {ayah.number}
+                </span>
+
+                <FaBookmark
+                  onClick={() => toggleBookmark(ayah.number)}
+                  className={`cursor-pointer transition 
+                    ${isBookmarked ? "text-purple-600" : "text-gray-300 hover:text-purple-400"}`}
+                />
+              </div>
+
+              {/* Arabic */}
+              <p className="text-right text-3xl leading-loose font-semibold text-gray-800">
+                {ayah.text}
               </p>
 
-              <FaBookmark
-                className={`${bookmarks.includes(ayah.number) ? "text-purple-600" : "text-gray-400"} cursor-pointer`}
-                onClick={() => toggleBookmark(ayah.number)}
+              {/* Translation */}
+              <p
+                className="mt-4 text-sm text-gray-600 leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: highlightText(ayah.translation)
+                }}
               />
 
+              {/* Play Button */}
+              <button
+                onClick={() => playAyah(index)}
+                className="mt-4 text-xs text-purple-600 hover:underline"
+              >
+                Play Ayat
+              </button>
+
             </div>
-
-            <p className="text-right text-2xl font-arabic mt-3">
-              {ayah.text}
-            </p>
-
-            <p
-              className="mt-4 text-sm"
-              dangerouslySetInnerHTML={{
-                __html: highlightText(ayah.translation)
-              }}
-            />
-
-            <button
-              onClick={() => playAyah(index)}
-              className="mt-3 text-purple-600 text-sm"
-            >
-              Play
-            </button>
-
-          </div>
-        ))}
+          );
+        })}
 
       </div>
 
     </div>
-  );
+  </div>
+);
 }
 
 export default SurahDetail;
