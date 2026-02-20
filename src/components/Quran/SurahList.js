@@ -30,7 +30,7 @@ function SurahList() {
     <div className="min-h-screen bg-gray-50 pb-24">
 
       {/* HEADER */}
-      <h1 className="m-4 text-2xl font-semibold">
+      <h1 className="p-4 text-2xl font-semibold">
         Al-Qur’an
       </h1>
 

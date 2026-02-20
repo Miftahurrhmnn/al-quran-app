@@ -14,7 +14,7 @@ function Layout({ children }) {
 
         {/* Bottom Floating Nav */}
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2
-                        w-[85%] bg-white rounded-full shadow-xl
+                        w-[85%] lg:w-[25%] bg-white rounded-full shadow-xl
                         flex justify-around py-4 z-50">
 
           <NavIcon to="/" active={location.pathname === "/"}>

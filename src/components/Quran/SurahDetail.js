@@ -15,7 +15,6 @@ function SurahDetail() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
   const [search, setSearch] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
 
   const audioRef = useRef(null);
 
@@ -130,7 +129,7 @@ function SurahDetail() {
   );
 
   return (
-    <div className={`${darkMode ? "bg-black text-white" : "bg-white text-black"} min-h-screen p-5`}>
+    <div>
 
       <button onClick={() => history.goBack()} className="mb-4 text-purple-500">
         ← Back
@@ -153,10 +152,6 @@ function SurahDetail() {
           {isPlaying ? <FaPause /> : <FaPlay />}
         </button>
 
-        <button onClick={() => setDarkMode(!darkMode)} className="px-4 py-2 bg-gray-300 rounded-xl">
-          Toggle Theme
-        </button>
-
         <input
           type="text"
           placeholder="Search..."
@@ -171,7 +166,7 @@ function SurahDetail() {
 
         {filteredAyahs.map((ayah, index) => (
           <div key={ayah.number}
-               className={`p-4 rounded-2xl shadow-sm 
+               className={`p-4 rounded-2xl shadow-md 
                ${currentIndex === index ? "bg-purple-100" : ""}`}>
 
             <div className="flex justify-between items-center">

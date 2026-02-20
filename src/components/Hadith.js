@@ -30,7 +30,7 @@ function Hadith() {
     fetchHadith();
   }, [fetchHadith]);
 
-  return (
+return (
     <div className="p-5">
 
       <h1 className="text-xl font-bold mb-4">Hadis</h1>
@@ -51,6 +51,13 @@ function Hadith() {
       </select>
 
       {loading && <p>Loading hadis...</p>}
+
+      
+      <input  
+        type="text"
+        placeholder="Cari hadis..."
+        className="mb-4 p-2 pl-5 w-full rounded"
+      />
 
       {/* ================= LIST HADIS ================= */}
       {hadiths.map((item) => (
