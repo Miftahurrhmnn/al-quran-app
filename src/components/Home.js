@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
-import { FaBookOpen, FaPray, FaCompass, FaMosque } from "react-icons/fa";
+import { FaBookOpen, FaPray, FaCompass, FaMosque, FaKaaba } from "react-icons/fa";
 import { Link, useHistory, useLocation } from "react-router-dom";
 
 import { WiMoonWaningCrescent3 } from "react-icons/wi";
@@ -22,6 +22,10 @@ function Home() {
     localStorage.getItem("timezone") || "Asia/Jakarta"
   );
 
+  const [selectedCountry, setSelectedCountry] = useState(
+    localStorage.getItem("country") || "Indonesia"
+  );
+
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isChangingLocation, setIsChangingLocation] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -34,6 +38,9 @@ function Home() {
   const [countdownNext, setCountdownNext] = useState("");
   const audioRef = useRef(null);
 
+  const [makkahTime, setMakkahTime] = useState("");
+  const [madinahTime, setMadinahTime] = useState("");
+
 
 
   /* ================= DAILY TRACKER ================= */
@@ -45,8 +52,8 @@ function Home() {
     setProgress(percentage);
   }, [location]);
 
-  /* ================= FETCH PRAYER TIME ================= */
 
+  /* ================= FETCH PRAYER TIME ================= */
   useEffect(() => {
 
     const fetchData = async () => {
@@ -63,7 +70,7 @@ function Home() {
           {
             params: {
               city: selectedCity,
-              country: "Indonesia",
+              country: selectedCountry,
               method: 11
             }
           }
@@ -77,7 +84,7 @@ function Home() {
       }
     };
     fetchData();
-  }, [selectedCity]);
+  }, [selectedCity, selectedCountry]);
 
   /* ================= REAL TIME CLOCK ================= */
 
@@ -91,6 +98,32 @@ function Home() {
 
     return () => clearInterval(timer);
   }, [selectedTimezone]);
+
+
+  /* ================= MAKKAH & MADINAH CLOCK ================= */
+  useEffect(() => {
+
+    const getTimeInTimezone = (tz) => {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: tz,
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+
+      return formatter.format(now).replace(/:/g, ".");
+    };
+
+    const timer = setInterval(() => {
+      setMakkahTime(getTimeInTimezone("Asia/Riyadh"));
+      setMadinahTime(getTimeInTimezone("Asia/Riyadh"));
+    }, 1000);
+
+    return () => clearInterval(timer);
+
+  }, []);
+
 
   /* ================= ACTIVE PRAYER ================= */
 
@@ -149,14 +182,14 @@ function Home() {
       }
     }
 
-  // Jika semua sudah lewat → Fajr besok
-  const [hour, minute] = times["Fajr"].split(":");
-  const fajrTomorrow = new Date();
-  fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
-  fajrTomorrow.setHours(hour, minute, 0, 0);
+    // Jika semua sudah lewat → Fajr besok
+    const [hour, minute] = times["Fajr"].split(":");
+    const fajrTomorrow = new Date();
+    fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
+    fajrTomorrow.setHours(hour, minute, 0, 0);
 
-  setNextPrayer("Fajr");
-  setNextPrayerTime(fajrTomorrow);
+    setNextPrayer("Fajr");
+    setNextPrayerTime(fajrTomorrow);
 
 }, [currentTime, times]);
 
@@ -171,7 +204,11 @@ useEffect(() => {
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
-  setCountdownNext(`${hours}h ${minutes}m`);
+  if (hours > 0) {
+    setCountdownNext(`${hours}j ${minutes}m`);
+  } else {
+    setCountdownNext(`${minutes}m`)
+  }
 
 }, [currentTime, nextPrayerTime]);
 
@@ -181,56 +218,56 @@ useEffect(() => {
   const [dailyQuote, setDailyQuote] = useState(null);
   
   useEffect(() => {
-  const quotes = [
-  {
-    text: "Jangan pernah menunda taubat, karena kita tidak pernah tahu kapan Allah memanggil kita.",
+    const quotes = [
+    {
+      text: "Jangan pernah menunda taubat, karena kita tidak pernah tahu kapan Allah memanggil kita.",
+      author: "Ustadz Hadi Hidayat"
+    },
+    {
+      text: "Ilmu itu bukan untuk dibanggakan, tapi untuk diamalkan.",
+      author: "Ustadz Hadi Hidayat"
+    },
+    {
+      text: "Dunia itu sementara, jangan sampai hati kita lebih terikat padanya daripada akhirat.",
+      author: "Ustadz Khalid Basalamah"
+    },
+    {
+      text: "Ibadah kecil tapi istiqamah lebih dicintai Allah daripada besar tapi jarang.",
+      author: "Ustadz Khalid Basalamah"
+    },
+    {
+    text: "Kalau dia memang untukmu, Allah akan dekatkan. Kalau tidak, Allah akan gantikan dengan yang lebih baik.",
     author: "Ustadz Hadi Hidayat"
-  },
-  {
-    text: "Ilmu itu bukan untuk dibanggakan, tapi untuk diamalkan.",
-    author: "Ustadz Hadi Hidayat"
-  },
-  {
-    text: "Dunia itu sementara, jangan sampai hati kita lebih terikat padanya daripada akhirat.",
-    author: "Ustadz Khalid Basalamah"
-  },
-  {
-    text: "Ibadah kecil tapi istiqamah lebih dicintai Allah daripada besar tapi jarang.",
-    author: "Ustadz Khalid Basalamah"
-  },
-  {
-  text: "Kalau dia memang untukmu, Allah akan dekatkan. Kalau tidak, Allah akan gantikan dengan yang lebih baik.",
-  author: "Ustadz Hadi Hidayat"
-  },
-  {
-    text: "Cinta yang tidak membawa kita kepada Allah, biasanya hanya membawa luka.",
-    author: "Ustadz Khalid Basalamah"
-  },
-  {
-    text: "Tidak semua yang kita inginkan itu baik. Kadang Allah menjauhkan karena Dia lebih tahu.",
-    author: "Ustadz Hadi Hidayat"
-  },
-  {
-    text: "Hati yang patah karena manusia akan sembuh ketika kembali kepada Allah.",
-    author: "Ustadz Khalid Basalamah"
-  },
-  {
-    text: "Kalau kamu kehilangan dia, tapi kamu mendekat kepada Allah, maka sebenarnya kamu tidak kehilangan apa-apa.",
-    author: "Ustadz Hadi Hidayat"
-  },
-  {
-    text: "Jangan kejar yang menjauh. Kejar ridha Allah, nanti yang baik akan datang sendiri.",
-    author: "Ustadz Khalid Basalamah"
-  },
-  {
-    text: "Allah kadang mematahkan hatimu untuk menyelamatkan masa depanmu.",
-    author: "Ustadz Hadi Hidayat"
-  },
-  {
-    text: "Bersabarlah dalam luka, karena Allah sedang menyiapkan cerita yang lebih indah.",
-    author: "Ustadz Khalid Basalamah"
-  }
-  ];
+    },
+    {
+      text: "Cinta yang tidak membawa kita kepada Allah, biasanya hanya membawa luka.",
+      author: "Ustadz Khalid Basalamah"
+    },
+    {
+      text: "Tidak semua yang kita inginkan itu baik. Kadang Allah menjauhkan karena Dia lebih tahu.",
+      author: "Ustadz Hadi Hidayat"
+    },
+    {
+      text: "Hati yang patah karena manusia akan sembuh ketika kembali kepada Allah.",
+      author: "Ustadz Khalid Basalamah"
+    },
+    {
+      text: "Kalau kamu kehilangan dia, tapi kamu mendekat kepada Allah, maka sebenarnya kamu tidak kehilangan apa-apa.",
+      author: "Ustadz Hadi Hidayat"
+    },
+    {
+      text: "Jangan kejar yang menjauh. Kejar ridha Allah, nanti yang baik akan datang sendiri.",
+      author: "Ustadz Khalid Basalamah"
+    },
+    {
+      text: "Allah kadang mematahkan hatimu untuk menyelamatkan masa depanmu.",
+      author: "Ustadz Hadi Hidayat"
+    },
+    {
+      text: "Bersabarlah dalam luka, karena Allah sedang menyiapkan cerita yang lebih indah.",
+      author: "Ustadz Khalid Basalamah"
+    }
+    ];
 
   const randomIndex = Math.floor(Math.random() * quotes.length);
     setDailyQuote(quotes[randomIndex]);
@@ -239,6 +276,10 @@ useEffect(() => {
 
   // Location
   const locations = [
+    // Mekkah & Madinah
+    { label: "Makkah (Saudi)", city: "Makkah", country: "Saudi Arabia", timezone: "Asia/Riyadh" },
+    { label: "Madinah (Saudi)", city: "Madinah", country: "Saudi Arabia", timezone: "Asia/Riyadh" },
+
     { label: "Jakarta & Sekitarnya (WIB)", city: "Jakarta", timezone: "Asia/Jakarta" },
     { label: "Bandung & Jawa Barat (WIB)", city: "Bandung", timezone: "Asia/Jakarta" },
     { label: "Yogyakarta & Jateng (WIB)", city: "Yogyakarta", timezone: "Asia/Jakarta" },
@@ -246,7 +287,7 @@ useEffect(() => {
     { label: "Banda Aceh (WIB)", city: "Banda Aceh", timezone: "Asia/Jakarta" },
     { label: "Balikpapan & Kaltim (WITA)", city: "Balikpapan", timezone: "Asia/Makassar" },
     { label: "Makassar & Sulsel (WITA)", city: "Makassar", timezone: "Asia/Makassar" },
-    { label: "Jayapura & Papua (WIT)", city: "Jayapura", timezone: "Asia/Jayapura" }
+    { label: "Jayapura & Papua (WIT)", city: "Jayapura", timezone: "Asia/Jayapura" },
   ];
 
   const selectLocation = (loc) => {
@@ -255,9 +296,11 @@ useEffect(() => {
 
     setTimeout(() => {
       setSelectedCity(loc.city);
+      setSelectedCountry(loc.country);
       setSelectedTimezone(loc.timezone);
 
       localStorage.setItem("city", loc.city);
+      localStorage.setItem("country", loc.country);
       localStorage.setItem("timezone", loc.timezone);
 
       setShowLocationModal(false);
@@ -287,10 +330,32 @@ useEffect(() => {
           className="flex items-center gap-2 text-sm mt-2 cursor-pointer opacity-80 duration-300 ease-in-out hover:font-bold"
         >
           <div className="flex justify-center items-center gap-2 duration-300 ease-in-out hover:font-bold">
-            <FaLocationDot className="text-orange-500" /> 
+            <FaLocationDot className="text-green-400" /> 
             {selectedCity}
             <IoIosArrowDown />
           </div>
+        </div>
+
+        {/* ================= MAKKAH & MADINAH TIME ================= */}
+        <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+
+          <div className="bg-white/10 rounded-xl p-3 text-center">
+            <div className="flex justify-center items-center gap-2">
+              <FaKaaba className="text-yellow-200" />
+              <p className="opacity-70">Makkah</p>
+            </div>
+            <p className="text-lg font-semibold mt-1">
+              {makkahTime}
+            </p>
+          </div>
+
+          <div className="bg-white/10 rounded-xl p-3 text-center">
+            <p className="opacity-70">Madinah</p>
+            <p className="text-lg font-semibold mt-1">
+              {madinahTime}
+            </p>
+          </div>
+
         </div>
 
         {/* ================= WAKTU SHOLAT ================= */}
@@ -312,12 +377,14 @@ useEffect(() => {
           </p>
         </div>
             
-        <WiMoonWaningCrescent3 
-          className="absolute top-10 right-8
-             text-6xl text-yellow-300 
-             drop-shadow-[0_0_20px_rgba(255,223,100,0.8)]
-             animate-float z-10"
-        />
+        {/* ======== BULAN ======== */}
+        <div className="absolute top-7 right-6 rotate-[-30deg] transform z-10">
+          <WiMoonWaningCrescent3
+            className="text-6xl text-yellow-300 
+              drop-shadow-[0_0_20px_rgba(255,223,100,0.8)]
+              animate-float"
+          />
+        </div>
 
 
         {/* ================= PRAYER ROW ================= */}
